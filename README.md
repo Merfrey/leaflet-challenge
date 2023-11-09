@@ -1,2 +1,2 @@
 # leaflet-challenge
-Leaflet Earthquake Darta
+Leaflet Earthquake Data
