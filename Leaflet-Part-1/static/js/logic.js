@@ -1,107 +1,8 @@
-// function createMap(data){
-
-//     let myMap3 = L.map("map", {
-//         center: [40.7128, -95.0059],
-//         zoom: 4,
-//         layers: [data]
-//       });
-    
-//       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-//         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-//       }).addTo(myMap3);
-    
-//       let mapStyle = {
-//         color: "brown",
-//         fillColor: "pink",
-//         fillOpacity: 0.3,
-//         weight: 1.5
-//       }
-//     }
-//       function createMarkers(features){ // response is the url
-    
-//               let earthquakeMarkers = []
-          
-//                 for (let x in features){
-//                  let station = features[x]// station is an object that's inside the stations array
-    
-//                       earthquakeMarkers.push(createPin(station))
-//                   }
-    
-//                   createMap(L.layerGroup(earthMarkers))
-    
-//             }
-//     //function will take in station, and output earthquake marker
-//             function createPin(station){
-//               Jan2022 = station["2022-01-31"]
-//               Feb2022 = station["2022-02-28"]
-//               Mar2022 = station["2022-03-31"]
-//               Apr2022 = station["2022-04-30"]
-//               May2022 = station["2022-05-31"]
-//               June2022 = station["2022-06-30"]
-//               July2022 = station["2022-07-31"]
-//               Aug2022 = station["2022-08-31"]
-//               Sep2022 = station["2022-09-30"]
-//               Oct2022 = station["2022-10-31"]
-//               Nov2022 = station["2022-11-30"]
-//               Dec2022 = station["2022-12-31"]
-//               Jan2023 = station["2023-01-31"]
-//               Feb2023 = station["2023-02-28"]
-//               Mar2023 = station["2023-03-31"]
-//               Apr2023 = station["2023-04-30"]
-//               May2023 = station["2023-05-31"]
-//               June2023 = station["2023-06-30"]
-//               July2023 = station["2023-07-31"]
-//               Aug2023 = station["2023-08-31"]
-//               Sep2023 = station["2023-09-30"]
-    
-//     let latDif = Math.abs(station.CountyLat - station.RegionLat)
-//     let lngDif = Math.abs(station.CountyLng - station.RegionLng)
-    
-//     let totalDif = Math.sqrt((latDif * latDif) + (lngDif * lngDif))
-    
-//     let pinColor 
-//               if (totalDif < 0.15) pinColor = '#FFFF00'; //yellow
-//               else if (totalDif < 0.25) pinColor = '#FF0000'; // red FF0000
-//               else if (totalDif < 0.5) pinColor = '#FFA500'; //orange
-//               else if (totalDif < 1) pinColor = '#008000'; // green #008000
-//               else if (totalDif < 2) pinColor = '#800080'; // purple #800080
-//               else pinColor = '#000000';
-    
-//               //sets the css style for the marker/pins
-//               const markerHtmlStyles = `
-//               background-color: ${pinColor};
-//               width: 1rem;
-//               height: 1rem;
-//               display: block;
-//               left: -0.5rem;
-//               top: -0.5rem;
-//               position: relative;
-//               border-radius: 3rem 3rem 0;
-//               transform: rotate(45deg);
-//               border: 1px solid #000000`
-            
-//             const myIcon = L.divIcon({
-//               className: "my-custom-pin",
-//              iconAnchor: [0, 24],
-//               html: `<span style="${markerHtmlStyles}" />`
-//             })
-     
-//                    let earthquakeMarker = L.marker([station.RegionLat, station.RegionLng],{icon: myIcon}).bindPopup("<h3>County: " +station.CountyName + "</h3>")
-    
-//               return earthquakeMarker;
-//             }
-    
-//               d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson").then(createMarkers)
-    
-
-
-
-
-
 let myMap = L.map("map", {
     center: [35, -115],
     zoom: 7
   });
+
 
   // Adding the tile layer
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -114,22 +15,25 @@ let myMap = L.map("map", {
     console.log(response);
     features = response.features
 
-   //let marker_limit = features.length //chose all the markers
+   //limits the amount of earthquakes looped
    let marker_limit = 1000
 
     for (let i = 0; i < marker_limit; i++) {
 
-        //grabs the corordinates of each earthquake
+        //grabs the coordinates of each earthquake
         let location = features[i].geometry;
 
         //grabs the depth of each earthquake
         let depth = location.coordinates[2];
 
+        //grabs the location of the earthquake
+        let placer = features[i].properties.place;
+
         //grabs the magnitude of each earthquake
         let magnitude = features[i].properties.mag;
 
         // makes the markers more visisble on the map
-        let markerRadius = magnitude * 30000;
+        let markerRadius = magnitude * 20000;
     
         let circleColor 
             if (depth >= -10 && depth < 10) circleColor = '#008000'; // green
@@ -138,37 +42,85 @@ let myMap = L.map("map", {
             else if (depth >= 50 && depth < 70) circleColor = '#FCD299'; // hopefully llght orange
             else if (depth >= 70 && depth < 90) circleColor = '#FFA500'; // orange
             else circleColor = '#FF0000'; // red
-    
-    //            //sets the css style for the marker/pins
-    //           const markerHtmlStyles = `
-    //            background-color: ${pinColor};
-    //            width: 1rem;
-    //            height: 1rem;
-    //            display: block;
-    //            left: -0.5rem;
-    //            top: -0.5rem;
-    //            position: relative;
-    //            border-radius: 3rem 3rem 0;
-    //            transform: rotate(45deg);
-    //            border: 1px solid #000000`
-            
-    //          const myIcon = L.divIcon
-    //          ({
-    //            className: "my-custom-pin",
-    //           iconAnchor: [0, 24],
-    //            html: `<span style="${markerHtmlStyles}" />`
-    //          })
 
 
 // tests the output of each number to make sure each is correct
 //console.log(`cord 1 is : ${location.coordinates[1]}`);
 //console.log(`cord 2 is : ${location.coordinates[0]}`);
 //console.log(`depth is : ${depth}`);
+//console.log(`magnitude is : ${magnitude})
 
-
-        if (location) {
-            L.circle([location.coordinates[1], location.coordinates[0]], {radius: markerRadius, color: circleColor}).addTo(myMap);
+        if (location)
+         {
+            L.circle(
+                [location.coordinates[1], location.coordinates[0] ],
+                {radius: markerRadius, 
+                color: circleColor
+            }).bindPopup(`<h1>Earthquake Data</h1>  <h3> Magnitude: ${magnitude}</h3><h3> Depth: ${depth}</h3></h3> Location: ${placer}<h3>`).addTo(myMap);
         }
-    }
+    }//above for loop end bracket
 
-})
+
+
+ // Set up the legend.
+ let legend = L.control({ position: "bottomright" });
+ legend.onAdd = function() {
+   //creating div tag, and info legend class
+   let div = L.DomUtil.create("div", "info legend");
+   let limits = geojson.options.limits;
+   let colors = geojson.options.colors;
+   let labels = [];
+
+   // Add the minimum and maximum.
+   let legendInfo = "<h1>Population with Children<br />(ages 6-17)</h1>" +
+     "<div class=\"labels\">" +
+       "<div class=\"min\">" + limits[0] + "</div>" +
+       "<div class=\"max\">" + limits[limits.length - 1] + "</div>" +
+     "</div>";
+
+   div.innerHTML = legendInfo;
+
+   limits.forEach(function(limit, index) {
+     labels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
+   });
+
+   div.innerHTML += "<ul>" + labels.join("") + "</ul>";
+   return div;
+ };
+
+ // Adding the legend to the map
+ legend.addTo(myMap);
+
+});
+
+
+
+
+
+       /*Legend Setup*/
+//    var legend = L.control({position: 'bottomright'});
+
+//    legend.onAdd = function (map)
+//     {
+   
+//        var div = L.DomUtil.create('div', 'info legend'),
+//            grades = [-10, 10, 30, 50, 70, 90],
+//            labels = [];
+   
+//        // loop through our density intervals and generate a label with a colored square for each interval
+//        for (var i = 0; i < grades.length; i++)
+//         {
+//            div.innerHTML +=
+//                '<i style="background:' + circleColor(grades[i] + 1) + '"></i> ' +
+//                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+//        }
+   
+//        return div;
+//    };
+   
+//    legend.addTo(myMap);
+
+
+// });
+
+ 
