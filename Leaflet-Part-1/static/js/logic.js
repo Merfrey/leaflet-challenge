@@ -99,7 +99,7 @@
 
 
 let myMap = L.map("map", {
-    center: [35, -120],
+    center: [35, -115],
     zoom: 7
   });
 
@@ -118,9 +118,56 @@ let myMap = L.map("map", {
    let marker_limit = 1000
 
     for (let i = 0; i < marker_limit; i++) {
-        let location = features[i].geometry; //featuers[0] is the index location 0]
+
+        //grabs the corordinates of each earthquake
+        let location = features[i].geometry;
+
+        //grabs the depth of each earthquake
+        let depth = location.coordinates[2];
+
+        //grabs the magnitude of each earthquake
+        let magnitude = features[i].properties.mag;
+
+        // makes the markers more visisble on the map
+        let markerRadius = magnitude * 30000;
+    
+        let circleColor 
+            if (depth >= -10 && depth < 10) circleColor = '#008000'; // green
+            else if (depth >= 10 && depth < 30) circleColor = '#90EE90'; // hopefully light green
+            else if (depth >= 30 && depth < 50) circleColor = '#FFFF00'; // yellow
+            else if (depth >= 50 && depth < 70) circleColor = '#FCD299'; // hopefully llght orange
+            else if (depth >= 70 && depth < 90) circleColor = '#FFA500'; // orange
+            else circleColor = '#FF0000'; // red
+    
+    //            //sets the css style for the marker/pins
+    //           const markerHtmlStyles = `
+    //            background-color: ${pinColor};
+    //            width: 1rem;
+    //            height: 1rem;
+    //            display: block;
+    //            left: -0.5rem;
+    //            top: -0.5rem;
+    //            position: relative;
+    //            border-radius: 3rem 3rem 0;
+    //            transform: rotate(45deg);
+    //            border: 1px solid #000000`
+            
+    //          const myIcon = L.divIcon
+    //          ({
+    //            className: "my-custom-pin",
+    //           iconAnchor: [0, 24],
+    //            html: `<span style="${markerHtmlStyles}" />`
+    //          })
+
+
+// tests the output of each number to make sure each is correct
+//console.log(`cord 1 is : ${location.coordinates[1]}`);
+//console.log(`cord 2 is : ${location.coordinates[0]}`);
+//console.log(`depth is : ${depth}`);
+
+
         if (location) {
-            L.marker([location.coordinates[1], location.coordinates[0]]).addTo(myMap);
+            L.circle([location.coordinates[1], location.coordinates[0]], {radius: markerRadius, color: circleColor}).addTo(myMap);
         }
     }
 
