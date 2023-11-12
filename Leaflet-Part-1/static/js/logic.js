@@ -12,13 +12,13 @@ let myMap = L.map("map", {
   let url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson"
 
   d3.json(url).then(function (response) {
-    console.log(response);
+    console.log(response.features);
     features = response.features
 
    //limits the amount of earthquakes looped
-   let marker_limit = 1000
+   //let marker_limit = 1000
 
-    for (let i = 0; i < marker_limit; i++) {
+    for (let i = 0; i < features.length; i++) {
 
         //grabs the coordinates of each earthquake
         let location = features[i].geometry;
@@ -35,14 +35,16 @@ let myMap = L.map("map", {
         // makes the markers more visisble on the map
         let markerRadius = magnitude * 20000;
     
-        let circleColor 
-            if (depth >= -10 && depth < 10) circleColor = '#008000'; // green
-            else if (depth >= 10 && depth < 30) circleColor = '#90EE90'; // hopefully light green
-            else if (depth >= 30 && depth < 50) circleColor = '#FFFF00'; // yellow
-            else if (depth >= 50 && depth < 70) circleColor = '#FCD299'; // hopefully llght orange
-            else if (depth >= 70 && depth < 90) circleColor = '#FFA500'; // orange
-            else circleColor = '#FF0000'; // red
-
+        //adds color to circles based on their depth value
+        function circleColor(depth)
+        {
+            if (depth >= -10 && depth < 10){ return '#008000'} // green
+            else if (depth >= 10 && depth < 30) {return '#90EE90';} // hopefully light green
+            else if (depth >= 30 && depth < 50) {return '#FFFF00';} // yellow
+            else if (depth >= 50 && depth < 70) {return '#FCD299';} // hopefully llght orange
+            else if (depth >= 70 && depth < 90) {return '#FFA500';} // orange
+            else return '#FF0000'; // red
+        }
 
 // tests the output of each number to make sure each is correct
 //console.log(`cord 1 is : ${location.coordinates[1]}`);
@@ -50,77 +52,73 @@ let myMap = L.map("map", {
 //console.log(`depth is : ${depth}`);
 //console.log(`magnitude is : ${magnitude})
 
-        if (location)
-         {
-            L.circle(
-                [location.coordinates[1], location.coordinates[0] ],
-                {radius: markerRadius, 
-                color: circleColor
+if (location) {
+    L.circle(
+        [location.coordinates[1], location.coordinates[0]],
+        {
+            radius: markerRadius,
+            color: circleColor(depth), // Set the circle outline color based on depth
+            fillColor: circleColor(depth) // Set the circle fill color based on depth
             }).bindPopup(`<h1>Earthquake Data</h1>  <h3> Magnitude: ${magnitude}</h3><h3> Depth: ${depth}</h3></h3> Location: ${placer}<h3>`).addTo(myMap);
         }
     }//above for loop end bracket
 
 
+ });
 
- // Set up the legend.
+ 
  let legend = L.control({ position: "bottomright" });
- legend.onAdd = function() {
-   //creating div tag, and info legend class
-   let div = L.DomUtil.create("div", "info legend");
-   let limits = geojson.options.limits;
-   let colors = geojson.options.colors;
-   let labels = [];
-
-   // Add the minimum and maximum.
-   let legendInfo = "<h1>Population with Children<br />(ages 6-17)</h1>" +
-     "<div class=\"labels\">" +
-       "<div class=\"min\">" + limits[0] + "</div>" +
-       "<div class=\"max\">" + limits[limits.length - 1] + "</div>" +
-     "</div>";
-
-   div.innerHTML = legendInfo;
-
-   limits.forEach(function(limit, index) {
-     labels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
-   });
-
-   div.innerHTML += "<ul>" + labels.join("") + "</ul>";
-   return div;
+ legend.onAdd = function(map) {
+     var div = L.DomUtil.create("div", "info legend"),
+         grades = [-10, 10, 30, 50, 70, 90],
+         colors = ['#008000', '#90EE90', '#FFFF00', '#FCD299', '#FFA500', '#FF0000'],
+         labels = [];
+ 
+     div.innerHTML = '<h4>Depth</h4>';
+ 
+     // Loop through depth intervals and generate a label with a colored square for each interval
+     for (var i = 0; i < grades.length; i++) {
+         div.innerHTML +=
+             '<i style="background:' + colors[i] + '"></i> ' +
+             grades[i] + (grades[i + 1] ? '&ndash;' + (grades[i + 1] - 1) + '<br>' : '+');
+     }
+     return div;
  };
-
- // Adding the legend to the map
+ 
  legend.addTo(myMap);
 
-});
 
 
+//  // Set up the legend attempt 2.
+//  let legend = L.control({ position: "bottomright" });
+//  legend.onAdd = function() {
+//    //creating div tag, and info legend class
+//    let div = L.DomUtil.create("div", "info legend");
+//    let limits = geojson.options.limits;
+//    let colors = geojson.options.colors;
+//    let labels = [];
 
+//    // Add the minimum and maximum.
+//    let legendInfo = "<h1>Population with Children<br />(ages 6-17)</h1>" +
+//      "<div class=\"labels\">" +
+//        "<div class=\"min\">" + limits[0] + "</div>" +
+//        "<div class=\"max\">" + limits[limits.length - 1] + "</div>" +
+//      "</div>";
 
+//    div.innerHTML = legendInfo;
 
-       /*Legend Setup*/
-//    var legend = L.control({position: 'bottomright'});
+//    limits.forEach(function(limit, index) {
+//      labels.push("<li style=\"background-color: " + colors[index] + "\"></li>");
+//    });
 
-//    legend.onAdd = function (map)
-//     {
-   
-//        var div = L.DomUtil.create('div', 'info legend'),
-//            grades = [-10, 10, 30, 50, 70, 90],
-//            labels = [];
-   
-//        // loop through our density intervals and generate a label with a colored square for each interval
-//        for (var i = 0; i < grades.length; i++)
-//         {
-//            div.innerHTML +=
-//                '<i style="background:' + circleColor(grades[i] + 1) + '"></i> ' +
-//                grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
-//        }
-   
-//        return div;
-//    };
-   
-//    legend.addTo(myMap);
+//    div.innerHTML += "<ul>" + labels.join("") + "</ul>";
+//    return div;
+//  };
 
+//  // Adding the legend to the map
+//  legend.addTo(myMap);
 
 // });
 
- 
+
+
